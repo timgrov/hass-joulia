@@ -54,6 +54,8 @@ class AneoMobilityClient:
         self._hass = hass
         self._session = async_get_clientsession(hass)
         self._base_url = base_url.rstrip("/")
+        if self._base_url != "https://api.aneomobility.com":
+            raise ValueError("Only the verified HTTPS Aneo API endpoint is allowed")
 
         self._user_id: str | None = None
         self._account_id: str | None = None
@@ -104,12 +106,12 @@ class AneoMobilityClient:
 
         try:
             async with async_timeout.timeout(TIMEOUT):
-                resp = await self._session.post(url, json=body)
+                resp = await self._session.post(url, json=body, allow_redirects=False)
         except (aiohttp.ClientError, TimeoutError) as err:
             raise CannotConnect(err) from err
 
         if resp.status in (401, 403):
-            await resp.release()
+            resp.release()
             raise InvalidAuth(f"HTTP {resp.status}")
 
         try:
@@ -118,7 +120,7 @@ class AneoMobilityClient:
         except aiohttp.ClientResponseError as err:
             raise CannotConnect(err) from err
         finally:
-            await resp.release()
+            resp.release()
 
         # Calculate access token expiry locally (55 minutes from now)
         access_token_expires_at = (
@@ -158,12 +160,12 @@ class AneoMobilityClient:
 
         try:
             async with async_timeout.timeout(TIMEOUT):
-                resp = await self._session.post(url, json=body)
+                resp = await self._session.post(url, json=body, allow_redirects=False)
         except (aiohttp.ClientError, TimeoutError) as err:
             raise CannotConnect(err) from err
 
         if resp.status in (401, 403):
-            await resp.release()
+            resp.release()
             raise InvalidRefreshToken(f"HTTP {resp.status}")
 
         try:
@@ -172,7 +174,7 @@ class AneoMobilityClient:
         except aiohttp.ClientResponseError as err:
             raise CannotConnect(err) from err
         finally:
-            await resp.release()
+            resp.release()
 
         # Calculate access token expiry locally (55 minutes from now)
         access_token_expires_at = (
@@ -206,7 +208,7 @@ class AneoMobilityClient:
 
         try:
             async with async_timeout.timeout(TIMEOUT):
-                resp = await self._session.get(url, headers=headers)
+                resp = await self._session.get(url, headers=headers, allow_redirects=False)
                 if resp.status in (401, 403):
                     raise InvalidAuth(f"HTTP {resp.status}")
                 resp.raise_for_status()
@@ -215,7 +217,7 @@ class AneoMobilityClient:
             raise CannotConnect(err) from err
         finally:
             try:
-                await resp.release()
+                resp.release()
             except Exception:
                 pass
 
@@ -232,7 +234,7 @@ class AneoMobilityClient:
 
         try:
             async with async_timeout.timeout(TIMEOUT):
-                resp = await self._session.get(url, headers=headers)
+                resp = await self._session.get(url, headers=headers, allow_redirects=False)
                 if resp.status in (401, 403):
                     raise InvalidAuth(f"HTTP {resp.status}")
                 resp.raise_for_status()
@@ -241,7 +243,7 @@ class AneoMobilityClient:
             raise CannotConnect(err) from err
         finally:
             try:
-                await resp.release()
+                resp.release()
             except Exception:
                 pass
 
@@ -262,11 +264,12 @@ class AneoMobilityClient:
                         "subscription": subscription,
                         "state": state,
                     }
+                except InvalidAuth:
+                    raise
                 except Exception as err:
                     _LOGGER.warning(
-                        "Failed to get state for charger %s: %s",
-                        redact(charger_id),
-                        err,
+                        "Failed to get charger state (%s)",
+                        type(err).__name__,
                     )
 
         return chargers_state
@@ -296,7 +299,7 @@ class AneoMobilityClient:
                 # Fetch today's prices (always)
                 _LOGGER.debug("Fetching prices for today (date=%s)", date_today)
 
-                resp_today = await self._session.get(url_today, headers=headers)
+                resp_today = await self._session.get(url_today, headers=headers, allow_redirects=False)
 
                 if resp_today.status in (401, 403):
                     try:
@@ -305,12 +308,12 @@ class AneoMobilityClient:
                         )
                     except Exception:
                         pass
-                    await resp_today.release()
+                    resp_today.release()
                     raise InvalidAuth(f"HTTP {resp_today.status}")
 
                 resp_today.raise_for_status()
                 prices_today = await resp_today.json()
-                await resp_today.release()
+                resp_today.release()
 
                 prices_tomorrow = {"prices": []}
                 if fetch_tomorrow:
@@ -318,7 +321,7 @@ class AneoMobilityClient:
                         "Fetching prices for tomorrow (date=%s)", date_tomorrow
                     )
                     resp_tomorrow = await self._session.get(
-                        url_tomorrow, headers=headers
+                        url_tomorrow, headers=headers, allow_redirects=False
                     )
                     prices_tomorrow = await resp_tomorrow.json()
 
@@ -330,12 +333,12 @@ class AneoMobilityClient:
                             )
                         except Exception:
                             pass
-                        await resp_tomorrow.release()
+                        resp_tomorrow.release()
                         raise InvalidAuth(f"HTTP {resp_tomorrow.status}")
 
                     resp_tomorrow.raise_for_status()
                     prices_tomorrow = await resp_tomorrow.json()
-                    await resp_tomorrow.release()
+                    resp_tomorrow.release()
                 else:
                     _LOGGER.debug(
                         "Skipping tomorrow prices fetch before %02d:00 Europe/Oslo",
@@ -383,7 +386,7 @@ class AneoMobilityClient:
 
         try:
             async with async_timeout.timeout(TIMEOUT):
-                resp = await self._session.post(url, headers=headers, json=body)
+                resp = await self._session.post(url, headers=headers, json=body, allow_redirects=False)
                 if resp.status in (401, 403):
                     raise InvalidAuth(f"HTTP {resp.status}")
                 resp.raise_for_status()
@@ -392,7 +395,7 @@ class AneoMobilityClient:
             raise CannotConnect(err) from err
         finally:
             try:
-                await resp.release()
+                resp.release()
             except Exception:
                 pass
 
@@ -416,7 +419,7 @@ class AneoMobilityClient:
 
         try:
             async with async_timeout.timeout(TIMEOUT):
-                resp = await self._session.post(url, headers=headers, json=body)
+                resp = await self._session.post(url, headers=headers, json=body, allow_redirects=False)
                 if resp.status in (401, 403):
                     raise InvalidAuth(f"HTTP {resp.status}")
                 resp.raise_for_status()
@@ -425,7 +428,7 @@ class AneoMobilityClient:
             raise CannotConnect(err) from err
         finally:
             try:
-                await resp.release()
+                resp.release()
             except Exception:
                 pass
 
@@ -445,7 +448,7 @@ class AneoMobilityClient:
 
         try:
             async with async_timeout.timeout(TIMEOUT):
-                resp = await self._session.post(url, headers=headers, json=body)
+                resp = await self._session.post(url, headers=headers, json=body, allow_redirects=False)
                 if resp.status in (401, 403):
                     raise InvalidAuth(f"HTTP {resp.status}")
                 resp.raise_for_status()
@@ -454,7 +457,7 @@ class AneoMobilityClient:
             raise CannotConnect(err) from err
         finally:
             try:
-                await resp.release()
+                resp.release()
             except Exception:
                 pass
 

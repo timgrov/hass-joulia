@@ -1,9 +1,9 @@
 {
-  "title": "Aneo Mobility",
+  "title": "Joulia",
   "config": {
     "step": {
       "user": {
-        "description": "Configure your Aneo Mobility account.",
+        "description": "Configure your Joulia account.",
         "data": {
           "url": "Base API url",
           "username": "Email address",
@@ -12,7 +12,7 @@
       }
     },
     "error": {
-      "cannot_connect": "Unable to connect to Aneo Mobility API.",
+      "cannot_connect": "Unable to connect to Joulia API.",
       "invalid_auth": "Invalid credentials provided.",
       "unknown": "Unexpected error occurred."
     },
@@ -21,7 +21,7 @@
   "options": {
     "step": {
       "init": {
-        "description": "Update your Aneo Mobility account information.",
+        "description": "Update your Joulia account information.",
         "data": {
           "interval_charger_state": "Charger state refresh rate (minutes)",
           "interval_price_data": "Price data gather interval (minutes)"
@@ -41,6 +41,9 @@
       },
       "price": {
         "name": "Price"
+      },
+      "actual_socket_status": {
+        "name": "Actual charger status"
       }
     },
     "binary_sensor": {

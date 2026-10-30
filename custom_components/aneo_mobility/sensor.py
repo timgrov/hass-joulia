@@ -9,6 +9,7 @@ from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
 )
+from homeassistant.helpers.entity import EntityCategory
 
 from .base import AneoMobilityEntity
 from .const import (
@@ -40,6 +41,7 @@ async def async_setup_entry(
                     charge_state_coordinator, config_entry, charger_id
                 )
             )
+            sensors.append(ActualSocketStatus(charge_state_coordinator, config_entry, charger_id))
 
     # Create price sensor (only one, not per-charger)
     sensors.append(PriceSensor(price_data_coordinator, config_entry))
@@ -84,6 +86,22 @@ class ChargerRawStateSensor(AneoMobilityEntity, SensorEntity):
             return "ready"
         else:  # Finishing or anything else
             return "stopped"
+
+
+class ActualSocketStatus(AneoMobilityEntity, SensorEntity):
+    """Untranslated socket status reported by the Joulia API."""
+
+    _attr_translation_key = "actual_socket_status"
+    _attr_name = "Joulia socket status"
+    _attr_icon = "mdi:ev-station"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    @property
+    def native_value(self):
+        data = self.coordinator.data or {}
+        charger = data.get(self._charger_id) or {}
+        sockets = (charger.get("state") or {}).get("sockets") or []
+        return sockets[0].get("status") if sockets and isinstance(sockets[0], dict) else None
 
 
 class PriceSensor(AneoMobilityEntity, SensorEntity):

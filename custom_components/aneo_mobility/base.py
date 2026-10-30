@@ -24,7 +24,7 @@ class AneoMobilityEntity(CoordinatorEntity):
             self._attr_device_info = {
                 "identifiers": {(DOMAIN, f"{config_entry.entry_id}_{charger_id}")},
                 "name": f"{charger_name}",
-                "manufacturer": "Aneo Mobility",
+                "manufacturer": "Joulia",
                 "model": "EV Charger",
             }
         else:
@@ -32,7 +32,7 @@ class AneoMobilityEntity(CoordinatorEntity):
             self._attr_device_info = {
                 "identifiers": {(DOMAIN, config_entry.entry_id)},
                 "name": config_entry.title,
-                "manufacturer": "Aneo Mobility",
+                "manufacturer": "Joulia",
                 "model": "Account",
             }
 

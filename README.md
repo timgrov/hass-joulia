@@ -1,66 +1,23 @@
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=InvisibleDuck&category=EV+Charging&repository=https%3A%2F%2Fgithub.com%2FInvisibleDuck%2Fhass-aneo-mobility)
-# Aneo Mobility (Home Assistant integration)
+# Joulia for Home Assistant
 
-A custom Home Assistant integration for Aneo Mobility EV chargers, providing charger status, price information, and basic control (start/stop charging and cable lock).
+An unofficial Home Assistant integration for Joulia charging services, formerly Aneo Mobility. It is based on [InvisibleDuck/hass-aneo-mobility](https://github.com/InvisibleDuck/hass-aneo-mobility), with the original MIT license and copyright retained.
 
-## Status / disclaimer
+**Status: experimental.** Connection, charger status and the new diagnostic sensor have been checked with one Joulia-managed Easee charger. Automatic starting has repeatedly produced a queued session that ended without charging on that installation; starting a new session manually in the Joulia app worked. The cause is still under investigation. Do not rely on automated charging without checking the result.
 
-This project is provided as-is and is not affiliated with Aneo Mobility.
+The integration polls the Joulia service for charger and price data. It exposes charger status, connection and charging indicators, price information, start/stop and cable-lock controls. The diagnostic **Actual charger status** reports the socket status as returned by the service without mapping it to a simplified state. The existing **Raw charger status** entity retains its historical `ready`, `charging` and `stopped` values for compatibility.
 
-**Important:** Most of the code in this repository was AI-generated (with manual review and edits). Please audit it yourself before relying on it for safety- or cost-critical automation.
-
-## Features
-
-- Sensors
-  - Raw charger status (mapped to `charging` / `ready` / `stopped`)
-  - Current price (NOK/kWh) + attributes for today/tomorrow hourly prices
-- Binary sensors
-  - Charging, car connected, cable locked
-- Switches
-  - Charging control (start/stop)
-  - Cable lock (lock/unlock)
+The connection indicator and charging-control switch are based on an incomplete mapping of service statuses. In particular, a queued session may be shown as disconnected or off. They should not be used as the sole evidence that a charger is disconnected or that it is safe to stop/restart a session. Polling may also miss short transitions.
 
 ## Installation
 
-### Option A: HACS (Custom repository)
-1. HACS → Integrations → 3-dots menu → “Custom repositories”
-2. Add this repository URL, type “Integration”
-3. Install
-4. Restart Home Assistant
+1. In HACS, add this repository as a custom repository of type **Integration**, then install **Joulia**; alternatively, copy `custom_components/aneo_mobility` to the same path in your Home Assistant configuration directory.
+2. Restart Home Assistant.
+3. Add **Joulia** under Settings → Devices & services and enter your Joulia account details.
 
-### Option B: Manual
-1. Copy the `aneo_mobility` folder into:
-   - `<config>/custom_components/aneo_mobility/`
-2. Restart Home Assistant
+The internal domain and directory remain `aneo_mobility` to preserve existing configuration entries and entity identifiers. If replacing the original integration, make a Home Assistant backup first and do not install both versions at the same time. This fork uses the existing Aneo API hostname; the hostname is a technical endpoint and has not been renamed.
 
-## Configuration
+## Privacy and support
 
-1. Settings → Devices & services → Add integration
-2. Search for “Aneo Mobility”
-3. Enter:
-   - Base API URL (default should work)
-   - Email address
-   - Password
+Account tokens are stored in Home Assistant's integration configuration and may be present in backups. Never publish `.storage`, backups, login details, tokens, charger or subscription identifiers, or unsanitized logs. The integration communicates with a cloud service and is not affiliated with or endorsed by Joulia.
 
-### Options
-
-You can adjust update intervals in the integration options:
-- Charger state refresh interval (minutes)
-- Price data refresh interval (minutes)
-
-## Security notes (read before filing issues)
-
-- This integration stores OAuth-like tokens (access token + refresh token) in the Home Assistant config entry data.
-- Home Assistant persists config entry data under its internal storage (commonly in the `.storage/` directory).
-- Never publish your Home Assistant `.storage/` directory, backups, or config entry exports, as they may contain your tokens.
-
-If you open GitHub issues, please sanitize logs before posting.
-
-## Development / contribution
-
-PRs are welcome. If you add logs, avoid printing:
-- Email/username
-- Subscription IDs
-- Charger IDs
-- Full request URLs that embed identifiers
-- Full API error bodies (they may contain identifying info)
+The source includes AI-assisted changes. Review the code and validate behavior with your own equipment before use. Please report issues without personal data or credentials.

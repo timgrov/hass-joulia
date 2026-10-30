@@ -93,8 +93,8 @@ class AneoMobilityChargingSwitch(AneoMobilityEntity, SwitchEntity):
             # Request coordinator refresh to update state
             await self.coordinator.async_request_refresh()
         except Exception as err:
-            _LOGGER.error("Failed to start charging: %s", err)
-            raise HomeAssistantError(f"Failed to start charging: {err}") from err
+            _LOGGER.error("Failed to start charging (%s)", type(err).__name__)
+            raise HomeAssistantError("Failed to start charging") from None
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Stop charging."""
@@ -119,8 +119,8 @@ class AneoMobilityChargingSwitch(AneoMobilityEntity, SwitchEntity):
             # Request coordinator refresh to update state
             await self.coordinator.async_request_refresh()
         except Exception as err:
-            _LOGGER.error("Failed to stop charging: %s", err)
-            raise HomeAssistantError(f"Failed to stop charging: {err}") from err
+            _LOGGER.error("Failed to stop charging (%s)", type(err).__name__)
+            raise HomeAssistantError("Failed to stop charging") from None
 
 
 class AneoMobilityCableLockSwitch(AneoMobilityEntity, SwitchEntity):
@@ -156,8 +156,8 @@ class AneoMobilityCableLockSwitch(AneoMobilityEntity, SwitchEntity):
             # Request coordinator refresh to update state
             await self.coordinator.async_request_refresh()
         except Exception as err:
-            _LOGGER.error("Failed to lock cable: %s", err)
-            raise HomeAssistantError(f"Failed to lock cable: {err}") from err
+            _LOGGER.error("Failed to lock cable (%s)", type(err).__name__)
+            raise HomeAssistantError("Failed to lock cable") from None
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Unlock the cable."""
@@ -172,5 +172,5 @@ class AneoMobilityCableLockSwitch(AneoMobilityEntity, SwitchEntity):
             # Request coordinator refresh to update state
             await self.coordinator.async_request_refresh()
         except Exception as err:
-            _LOGGER.error("Failed to unlock cable: %s", err)
-            raise HomeAssistantError(f"Failed to unlock cable: {err}") from err
+            _LOGGER.error("Failed to unlock cable (%s)", type(err).__name__)
+            raise HomeAssistantError("Failed to unlock cable") from None

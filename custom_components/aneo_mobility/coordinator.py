@@ -72,7 +72,7 @@ class AneoMobilityChargerStateCoordinator(DataUpdateCoordinator):
                     "Refresh token expired, please re-authenticate"
                 ) from err
         except Exception as err:
-            raise UpdateFailed(f"Error communicating with API: {err}") from err
+            raise UpdateFailed("Error communicating with charging service") from None
 
 
 class AneoMobilityPriceTrackerCoordinator(DataUpdateCoordinator):
@@ -142,4 +142,4 @@ class AneoMobilityPriceTrackerCoordinator(DataUpdateCoordinator):
                     "Refresh token expired, please re-authenticate"
                 ) from err
         except Exception as err:
-            raise UpdateFailed(f"Error communicating with API: {err}") from err
+            raise UpdateFailed("Error communicating with charging service") from None

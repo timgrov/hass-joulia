@@ -4,7 +4,8 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from .api import CannotConnect
 from homeassistant.helpers import device_registry as dr
 
 from .api import AneoMobilityClient, InvalidRefreshToken
@@ -37,6 +38,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.config_entries.async_update_entry(
             entry, data={**entry.data, **client.tokens}
         )
+    except CannotConnect as err:
+        raise ConfigEntryNotReady("Charging service unavailable") from None
     except InvalidRefreshToken as err:
         # Refresh token is invalid/expired -> trigger reauth
         raise ConfigEntryAuthFailed(
@@ -55,8 +58,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         AneoMobilityPriceTrackerCoordinator(hass, entry),
     ]
 
-    for coordinator in coordinators:
-        await coordinator.async_config_entry_first_refresh()
+    await coordinators[0].async_config_entry_first_refresh()
+    # Price information is optional and must not block charger availability.
+    await coordinators[1].async_refresh()
 
     # Store coordinators
     hass.data[DOMAIN][entry.entry_id]["coordinators"] = coordinators

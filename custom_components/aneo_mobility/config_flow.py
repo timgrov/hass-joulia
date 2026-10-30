@@ -75,7 +75,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     entry_data["subscription_id"] = subscription_id
 
                 return self.async_create_entry(
-                    title="Aneo Mobility Account",
+                    title="Joulia Account",
                     data=entry_data,
                 )
 

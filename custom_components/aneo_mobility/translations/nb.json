@@ -1,9 +1,9 @@
 {
-  "title": "Aneo Mobility",
+  "title": "Joulia",
   "config": {
     "step": {
       "user": {
-        "description": "Konfigurer Aneo Mobility-kontoen din.",
+        "description": "Konfigurer Joulia-kontoen din.",
         "data": {
           "url": "API-adresse (URL)",
           "username": "E-postadresse",
@@ -12,8 +12,8 @@
       }
     },
     "error": {
-      "cannot_connect": "Kunne ikke koble til Aneo Mobility-API.",
-      "invalid_auth": "Ugyldige innloggingsdetaljer. Kontroller at du bruker en Aneo Mobility-konto.",
+      "cannot_connect": "Kunne ikke koble til Joulia-API.",
+      "invalid_auth": "Ugyldige innloggingsdetaljer. Kontroller at du bruker en Joulia-konto.",
       "unknown": "En uventet feil oppstod."
     },
     "abort": {}
@@ -21,7 +21,7 @@
   "options": {
     "step": {
       "init": {
-        "description": "Oppdater innstillingene for Aneo Mobility-kontoen din.",
+        "description": "Oppdater innstillingene for Joulia-kontoen din.",
         "data": {
           "interval_charger_state": "Oppdateringsintervall for laderstatus (minutter)",
           "interval_price_data": "Oppdateringsintervall for prisdata (minutter)"
@@ -41,6 +41,9 @@
       },
       "price": {
         "name": "Pris"
+      },
+      "actual_socket_status": {
+        "name": "Faktisk laderstatus"
       }
     },
     "binary_sensor": {
